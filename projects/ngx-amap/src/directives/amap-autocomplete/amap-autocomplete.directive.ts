@@ -5,6 +5,7 @@ import { LoggerService } from '../../services/logger/logger.service';
 import { AutocompleteOptions } from '../../types/interface';
 import { AmapAutocompleteService, AmapAutocompleteWrapper } from '../../services/amap-autocomplete/amap-autocomplete.service';
 import { Utils } from '../../utils/utils';
+import { ChangeFilter } from '../../utils/change-filter';
 
 const ALL_OPTIONS = [
   'type',
@@ -48,7 +49,13 @@ export class AmapAutocompleteDirective implements OnChanges, OnInit, OnDestroy {
     private el: ElementRef
   ) {}
 
-  ngOnChanges(changes: SimpleChanges) {}
+  ngOnChanges(changes: SimpleChanges) {
+    const filter = ChangeFilter.of(changes);
+    filter.has<string>('type').subscribe(v => this.setType(v));
+    filter.has<string>('city').subscribe(v => this.setCity(v));
+    filter.has<string>('datatype').subscribe(v => this.setDataType(v));
+    filter.has<boolean>('citylimit').subscribe(v => this.setCityLimit(!!v));
+  }
 
   ngOnInit() {
     const options = Utils.getOptionsFor<AutocompleteOptions>(this, ALL_OPTIONS);
@@ -71,5 +78,22 @@ export class AmapAutocompleteDirective implements OnChanges, OnInit, OnDestroy {
     this._subscription.add(wrapper.on('error').subscribe(e => this.error.emit(e)));
     this._subscription.add(wrapper.on('select').subscribe(e => this.select.emit(e)));
     this._subscription.add(wrapper.on('choose').subscribe(e => this.choose.emit(e)));
+  }
+
+  setType(type: string): Promise<void> {
+    return this._plugin.then(wrapper => wrapper.setType(type));
+  }
+
+  setCity(city: string): Promise<void> {
+    return this._plugin.then(wrapper => wrapper.setCity(city));
+  }
+
+  // fixme: 等原项目主人对wrapper添加了相应的方法后再激活
+  // setDataType(datatype: string): Promise<void> {
+  //   return this._plugin.then(wrapper => wrapper.setDataType(datatype));
+  // }
+
+  setCityLimit(citylimit: boolean): Promise<void> {
+    return this._plugin.then(wrapper => wrapper.setCityLimit(citylimit));
   }
 }
