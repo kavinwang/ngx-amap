@@ -53,7 +53,8 @@ export class AmapAutocompleteDirective implements OnChanges, OnInit, OnDestroy {
     const filter = ChangeFilter.of(changes);
     filter.has<string>('type').subscribe(v => this.setType(v));
     filter.has<string>('city').subscribe(v => this.setCity(v));
-    filter.has<string>('datatype').subscribe(v => this.setDataType(v));
+    // fixme: 等原项目主人对wrapper添加了相应的方法后再激活
+    //filter.has<string>('datatype').subscribe(v => this.setDataType(v));
     filter.has<boolean>('citylimit').subscribe(v => this.setCityLimit(!!v));
   }
 
